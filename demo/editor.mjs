@@ -1,11 +1,42 @@
 import {EditorView, basicSetup} from "codemirror"
-import { EditorState } from '@codemirror/state';
+import { EditorState, Compartment } from '@codemirror/state';
 import {parser} from "./strawk.parser.js"
 import {foldNodeProp, foldInside, indentNodeProp} from "@codemirror/language"
 import {styleTags, tags as t} from "@lezer/highlight"
 import {LRLanguage} from "@codemirror/language"
 import {completeFromList} from "@codemirror/autocomplete"
 import {LanguageSupport} from "@codemirror/language"
+
+// Dark theme configuration for CodeMirror to match Bootstrap dark mode
+const darkTheme = EditorView.theme({
+  "&": {
+    backgroundColor: "#212529",
+    color: "#adb5bd"
+  },
+  ".cm-content": {
+    caretColor: "#adb5bd"
+  },
+  ".cm-cursor, .cm-dropCursor": {
+    borderLeftColor: "#adb5bd"
+  },
+  "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
+    backgroundColor: "#495057"
+  },
+  ".cm-activeLine": {
+    backgroundColor: "#2c3034"
+  },
+  ".cm-gutters": {
+    backgroundColor: "#1a1d20",
+    color: "#6c757d",
+    border: "none"
+  },
+  ".cm-activeLineGutter": {
+    backgroundColor: "#2c3034"
+  }
+}, {dark: true});
+
+// Theme compartment for dynamic switching
+const themeCompartment = new Compartment();
 
 export const parserWithMetadata = parser.configure({
   props: [
@@ -43,9 +74,12 @@ export function strawk() {
 }
 
 function createEditorStateForStrawk(initialContents, options = {}) {
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
     let extensions = [
       basicSetup,
-      strawk()
+      strawk(),
+      themeCompartment.of(isDark ? darkTheme : [])
     ];
 
     return EditorState.create({
@@ -55,8 +89,11 @@ function createEditorStateForStrawk(initialContents, options = {}) {
 }
 
 function createEditorState(initialContents, options = {}) {
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
     let extensions = [
-      basicSetup
+      basicSetup,
+      themeCompartment.of(isDark ? darkTheme : [])
     ];
 
     return EditorState.create({
@@ -69,6 +106,13 @@ function createEditorView(state, parent) {
     return new EditorView({ state, parent });
 }
 
-export { createEditorStateForStrawk, createEditorState, createEditorView};
+// Function to update the theme of an existing editor
+function updateEditorTheme(view, isDark) {
+    view.dispatch({
+        effects: themeCompartment.reconfigure(isDark ? darkTheme : [])
+    });
+}
+
+export { createEditorStateForStrawk, createEditorState, createEditorView, updateEditorTheme, themeCompartment };
 
 

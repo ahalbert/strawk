@@ -10636,7 +10636,7 @@ var cm6 = (function (exports) {
   }
 
   const theme = /*@__PURE__*/Facet.define({ combine: strs => strs.join(" ") });
-  const darkTheme = /*@__PURE__*/Facet.define({ combine: values => values.indexOf(true) > -1 });
+  const darkTheme$1 = /*@__PURE__*/Facet.define({ combine: values => values.indexOf(true) > -1 });
   const baseThemeID = /*@__PURE__*/StyleModule.newName(), baseLightID = /*@__PURE__*/StyleModule.newName(), baseDarkID = /*@__PURE__*/StyleModule.newName();
   const lightDarkIDs = { "&light": "." + baseLightID, "&dark": "." + baseDarkID };
   function buildTheme(main, spec, scopes) {
@@ -12048,7 +12048,7 @@ var cm6 = (function (exports) {
       */
       get themeClasses() {
           return baseThemeID + " " +
-              (this.state.facet(darkTheme) ? baseDarkID : baseLightID) + " " +
+              (this.state.facet(darkTheme$1) ? baseDarkID : baseLightID) + " " +
               this.state.facet(theme);
       }
       updateAttrs() {
@@ -12530,7 +12530,7 @@ var cm6 = (function (exports) {
           let prefix = StyleModule.newName();
           let result = [theme.of(prefix), styleModule.of(buildTheme(`.${prefix}`, spec))];
           if (options && options.dark)
-              result.push(darkTheme.of(true));
+              result.push(darkTheme$1.of(true));
           return result;
       }
       /**
@@ -12708,7 +12708,7 @@ var cm6 = (function (exports) {
   includes an instance of this when the `dark` option is set to
   true.
   */
-  EditorView.darkTheme = darkTheme;
+  EditorView.darkTheme = darkTheme$1;
   /**
   Provides a Content Security Policy nonce to use when creating
   the style sheets for the editor. Holds the empty string when no
@@ -26355,6 +26355,37 @@ var cm6 = (function (exports) {
     tokenPrec: 1745
   });
 
+  // Dark theme configuration for CodeMirror to match Bootstrap dark mode
+  const darkTheme = EditorView.theme({
+    "&": {
+      backgroundColor: "#212529",
+      color: "#adb5bd"
+    },
+    ".cm-content": {
+      caretColor: "#adb5bd"
+    },
+    ".cm-cursor, .cm-dropCursor": {
+      borderLeftColor: "#adb5bd"
+    },
+    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
+      backgroundColor: "#495057"
+    },
+    ".cm-activeLine": {
+      backgroundColor: "#2c3034"
+    },
+    ".cm-gutters": {
+      backgroundColor: "#1a1d20",
+      color: "#6c757d",
+      border: "none"
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "#2c3034"
+    }
+  }, {dark: true});
+
+  // Theme compartment for dynamic switching
+  const themeCompartment = new Compartment();
+
   const parserWithMetadata = parser.configure({
     props: [
       styleTags({
@@ -26391,9 +26422,12 @@ var cm6 = (function (exports) {
   }
 
   function createEditorStateForStrawk(initialContents, options = {}) {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
       let extensions = [
         basicSetup,
-        strawk()
+        strawk(),
+        themeCompartment.of(isDark ? darkTheme : [])
       ];
 
       return EditorState.create({
@@ -26403,8 +26437,11 @@ var cm6 = (function (exports) {
   }
 
   function createEditorState(initialContents, options = {}) {
+      const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
       let extensions = [
-        basicSetup
+        basicSetup,
+        themeCompartment.of(isDark ? darkTheme : [])
       ];
 
       return EditorState.create({
@@ -26417,12 +26454,21 @@ var cm6 = (function (exports) {
       return new EditorView({ state, parent });
   }
 
+  // Function to update the theme of an existing editor
+  function updateEditorTheme(view, isDark) {
+      view.dispatch({
+          effects: themeCompartment.reconfigure(isDark ? darkTheme : [])
+      });
+  }
+
   exports.createEditorState = createEditorState;
   exports.createEditorStateForStrawk = createEditorStateForStrawk;
   exports.createEditorView = createEditorView;
   exports.exampleLanguage = exampleLanguage;
   exports.parserWithMetadata = parserWithMetadata;
   exports.strawk = strawk;
+  exports.themeCompartment = themeCompartment;
+  exports.updateEditorTheme = updateEditorTheme;
 
   return exports;
 
