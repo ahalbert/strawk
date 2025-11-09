@@ -14,11 +14,11 @@ const captureGroups ='# If a regex is matched, the full value is put in $0 and e
 const captureGroupsInput ='Name: Bob\nFavorite Food: Apple\n\nName: Alice\nFavorite Food: Banana\n\nName: Pam\nFavorite Food: Orange\n\nName: George\nFavorite Food: Banana';
 
 const fsastate = cm6.createEditorStateForStrawk(introduction);
-const fsaed = cm6.createEditorView(fsastate, document.getElementById("strawkeditor"));
+export const fsaed = cm6.createEditorView(fsastate, document.getElementById("strawkeditor"));
 const inputstate = cm6.createEditorState(introductioninput);
-const inputed = cm6.createEditorView(inputstate, document.getElementById("inputeditor"));
+export const inputed = cm6.createEditorView(inputstate, document.getElementById("inputeditor"));
 const outputstate = cm6.createEditorState("");
-const outputed = cm6.createEditorView(outputstate, document.getElementById("outputeditor"));
+export const outputed = cm6.createEditorView(outputstate, document.getElementById("outputeditor"));
 
 function runProgram() {
   var body = {
