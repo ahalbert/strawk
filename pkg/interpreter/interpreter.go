@@ -60,6 +60,12 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 		}
 	}
 
+	i.StdLibFunctions["atan2"] = Atan2
+	i.StdLibFunctions["cos"] = Cos
+	i.StdLibFunctions["sin"] = Sin
+	i.StdLibFunctions["exp"] = Exp
+	i.StdLibFunctions["log"] = Log
+	i.StdLibFunctions["sqrt"] = Sqrt
 	i.StdLibFunctions["length"] = Length
 	i.StdLibFunctions["sub"] = Sub
 	i.StdLibFunctions["gsub"] = Gsub

@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -282,4 +283,110 @@ func Match(i *Interpreter, args []ast.Expression) ast.Expression {
 		return ast.NewLiteral(strconv.Itoa(-1))
 	}
 	return ast.NewLiteral(strconv.Itoa(loc[0]))
+}
+
+// Math Functions
+
+func Atan2(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 2 {
+		panic("Incorrect number of arguments to function atan2")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function atan2 is not a scalar.")
+	}
+
+	switch args[1].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("second argument to function atan2 is not a scalar.")
+	}
+
+	y := convertLiteralForMathOp(args[0])
+	x := convertLiteralForMathOp(args[1])
+	answer := math.Atan2(y, x)
+	return &ast.NumericLiteral{Value: answer}
+}
+
+func Cos(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function cos")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function cos is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	answer := math.Cos(x)
+	return &ast.NumericLiteral{Value: answer}
+}
+
+func Sin(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function sin")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function sin is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	answer := math.Sin(x)
+	return &ast.NumericLiteral{Value: answer}
+}
+
+func Exp(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function exp")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function exp is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	answer := math.Exp(x)
+	return &ast.NumericLiteral{Value: answer}
+}
+
+func Log(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function log")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function log is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	answer := math.Log(x)
+	return &ast.NumericLiteral{Value: answer}
+}
+
+func Sqrt(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function sqrt")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function sqrt is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	answer := math.Sqrt(x)
+	return &ast.NumericLiteral{Value: answer}
 }
