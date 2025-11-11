@@ -30,6 +30,7 @@ type Interpreter struct {
 	StdLibFunctions              map[string]func(*Interpreter, []ast.Expression) ast.Expression
 	UserDefinedFunctions         map[string]*ast.FunctionLiteral
 	mostRecentRegexCaptureGroups map[string]ast.Expression
+	seed                         int64
 }
 
 type CallStackEntry struct {
@@ -44,6 +45,7 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 		GlobalVariables:      make(map[string]ast.Expression),
 		StdLibFunctions:      make(map[string]func(*Interpreter, []ast.Expression) ast.Expression),
 		UserDefinedFunctions: make(map[string]*ast.FunctionLiteral),
+		seed:                 1,
 	}
 	i.resetStack()
 	i.InputPostion = 0
@@ -67,6 +69,8 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 	i.StdLibFunctions["log"] = Log
 	i.StdLibFunctions["sqrt"] = Sqrt
 	i.StdLibFunctions["int"] = Int
+	i.StdLibFunctions["rand"] = Rand
+	i.StdLibFunctions["srand"] = Srand
 	i.StdLibFunctions["length"] = Length
 	i.StdLibFunctions["sub"] = Sub
 	i.StdLibFunctions["gsub"] = Gsub

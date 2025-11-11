@@ -2,9 +2,11 @@ package interpreter
 
 import (
 	"math"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ahalbert/strawk/pkg/ast"
 )
@@ -406,4 +408,35 @@ func Int(i *Interpreter, args []ast.Expression) ast.Expression {
 	int_x := int(x)
 	answer := float64(int_x)
 	return &ast.NumericLiteral{Value: answer}
+}
+
+func Rand(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 0 {
+		panic("Incorrect number of arguments to function rand")
+	}
+
+	r := rand.New(rand.NewSource(i.seed))
+	return &ast.NumericLiteral{Value: r.Float64()}
+}
+
+func Srand(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) > 1 {
+		panic("Incorrect number of arguments to function srand")
+	}
+
+	prev := float64(i.seed)
+	var newSeed int
+	if len(args) == 1 {
+		switch args[0].(type) {
+		case *ast.StringLiteral:
+		case *ast.NumericLiteral:
+		default:
+			panic("first argument to function int is not a scalar.")
+		}
+		newSeed = int(convertLiteralForMathOp(args[0]))
+	} else {
+		newSeed = int(time.Now().UnixNano())
+	}
+	i.seed = int64(newSeed)
+	return &ast.NumericLiteral{Value: prev}
 }
