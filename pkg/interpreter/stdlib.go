@@ -390,3 +390,20 @@ func Sqrt(i *Interpreter, args []ast.Expression) ast.Expression {
 	answer := math.Sqrt(x)
 	return &ast.NumericLiteral{Value: answer}
 }
+
+func Int(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) != 1 {
+		panic("Incorrect number of arguments to function int")
+	}
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+	case *ast.NumericLiteral:
+	default:
+		panic("first argument to function int is not a scalar.")
+	}
+
+	x := convertLiteralForMathOp(args[0])
+	int_x := int(x)
+	answer := float64(int_x)
+	return &ast.NumericLiteral{Value: answer}
+}

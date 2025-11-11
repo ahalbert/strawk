@@ -66,6 +66,7 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 	i.StdLibFunctions["exp"] = Exp
 	i.StdLibFunctions["log"] = Log
 	i.StdLibFunctions["sqrt"] = Sqrt
+	i.StdLibFunctions["int"] = Int
 	i.StdLibFunctions["length"] = Length
 	i.StdLibFunctions["sub"] = Sub
 	i.StdLibFunctions["gsub"] = Gsub

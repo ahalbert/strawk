@@ -6,4 +6,6 @@ BEGIN {
   print log(2)
   print sqrt(2)
   print sqrt(-2)
+  print int(1.7)
+  print int(-2.7)
 }
