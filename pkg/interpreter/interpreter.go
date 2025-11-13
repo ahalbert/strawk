@@ -75,6 +75,7 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 	i.StdLibFunctions["sub"] = Sub
 	i.StdLibFunctions["gsub"] = Gsub
 	i.StdLibFunctions["split"] = Split
+	i.StdLibFunctions["sprintf"] = Sprintf
 	i.StdLibFunctions["toupper"] = ToUpper
 	i.StdLibFunctions["tolower"] = ToLower
 	i.StdLibFunctions["substr"] = Substr
