@@ -1,6 +1,12 @@
 
 # strawk: STRuctured AWK
 
+## Demo 
+
+strawk now has a live demo! [Try it out here](https://ahalbert.github.io/strawk/demo/strawk.html).
+
+## About 
+
 An AWK implementation using Structural Regular Expressions rather than processing things line-by-line
 
 Rob Pike wrote a paper [Structural Regular Expressions](https://doc.cat-v.org/bell_labs/structural_regexps/se.pdf) that criticized the Unix toolset for being excessively line oriented. Tools like awk and grep assume a regular record structure usually denoted by newlines. Unix pipes just stream the file from one command to another, and imposing the newline structure limits the power of the Unix shell. 
