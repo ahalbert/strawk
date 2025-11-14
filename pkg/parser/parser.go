@@ -210,6 +210,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseIfStatement()
 	case token.PRINT:
 		return p.parsePrintStatement()
+	case token.PRINTF:
+		return p.parsePrintfStatement()
 	case token.DELETE:
 		return p.parseDeleteStatement()
 	case token.NEWLINE:
@@ -489,6 +491,13 @@ func (p *Parser) parseNextStatement() *ast.NextStatement {
 
 func (p *Parser) parsePrintStatement() *ast.PrintStatement {
 	stmt := &ast.PrintStatement{Token: p.curToken}
+	p.nextToken()
+	stmt.Expressions = p.parseExpressionList(token.SEMICOLON)
+	return stmt
+}
+
+func (p *Parser) parsePrintfStatement() *ast.PrintfStatement {
+	stmt := &ast.PrintfStatement{Token: p.curToken}
 	p.nextToken()
 	stmt.Expressions = p.parseExpressionList(token.SEMICOLON)
 	return stmt

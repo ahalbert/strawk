@@ -79,6 +79,7 @@ const (
 	END      = "END"
 	IN       = "IN"
 	PRINT    = "PRINT"
+	PRINTF   = "PRINTF"
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
@@ -95,6 +96,7 @@ var keywords = map[string]TokenType{
 	"next":     NEXT,
 	"in":       IN,
 	"print":    PRINT,
+	"printf":   PRINTF,
 	"BEGIN":    BEGIN,
 	"END":      END,
 	"if":       IF,

@@ -239,6 +239,36 @@ func Substr(i *Interpreter, args []ast.Expression) ast.Expression {
 	return ast.NewLiteral(s[m : m+n])
 }
 
+func Printf(i *Interpreter, args []ast.Expression) ast.Expression {
+	if len(args) < 1 {
+		panic("Incorrect number of arguments to printf")
+	}
+
+	var fmtString string
+	switch args[0].(type) {
+	case *ast.StringLiteral:
+		fmtString = args[0].(*ast.StringLiteral).Value
+	case *ast.NumericLiteral:
+		panic("first argument to printf is not a string.")
+	default:
+		panic("first argument to printf is not a string.")
+	}
+
+	var sprintfArgs []any
+	for index, arg := range args[1:] {
+		switch arg.(type) {
+		case *ast.StringLiteral:
+			sprintfArgs = append(sprintfArgs, arg.(*ast.StringLiteral).Value)
+		case *ast.NumericLiteral:
+			sprintfArgs = append(sprintfArgs, arg.(*ast.NumericLiteral).Value)
+		default:
+			panic(fmt.Sprintf("argument %d to printf is not a literal.", index+1))
+		}
+	}
+	result := fmt.Sprintf(fmtString, sprintfArgs...)
+	return ast.NewLiteral(result)
+}
+
 func Sprintf(i *Interpreter, args []ast.Expression) ast.Expression {
 	if len(args) < 1 {
 		panic("Incorrect number of arguments to function sprintf")

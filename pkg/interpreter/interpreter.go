@@ -286,6 +286,8 @@ func (i *Interpreter) doStatement(stmt ast.Statement) {
 		i.doExpressionList(stmt.(*ast.ExpressionStatement).Expressions)
 	case *ast.PrintStatement:
 		i.doPrintStatement(stmt.(*ast.PrintStatement))
+	case *ast.PrintfStatement:
+		i.doPrintfStatement(stmt.(*ast.PrintfStatement))
 	case *ast.ActionBlockStatement:
 		i.doBlock(stmt.(*ast.ActionBlockStatement))
 	case *ast.AssignStatement:
@@ -335,6 +337,13 @@ func (i *Interpreter) doBlock(block ast.Block) {
 func (i *Interpreter) evaluateActionBlockConditon(block *ast.ActionBlockStatement) bool {
 	evaluatedExpr := i.doExpression(block.Conditon)
 	return ExpressionToBool(evaluatedExpr)
+}
+
+func (i *Interpreter) doPrintfStatement(stmt *ast.PrintfStatement) {
+	exprs := i.doExpressionList(stmt.Expressions[1:])
+	toBePrinted := Printf(i, append([]ast.Expression{stmt.Expressions[0]}, exprs...))
+	io.WriteString(i.Output, toBePrinted.String())
+	io.WriteString(i.Output, "\n")
 }
 
 func (i *Interpreter) doPrintStatement(stmt *ast.PrintStatement) {

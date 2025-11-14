@@ -189,6 +189,27 @@ func (ps *PrintStatement) String() string {
 	return out.String()
 }
 
+type PrintfStatement struct {
+	Token       token.Token // the print token
+	Expressions []Expression
+}
+
+func (ps *PrintfStatement) statementNode()        {}
+func (ps *PrintfStatement) GetToken() token.Token { return ps.Token }
+func (ps *PrintfStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString("printf ")
+
+	for idx, s := range ps.Expressions {
+		out.WriteString(s.String())
+		if idx < len(ps.Expressions) {
+			out.WriteString(",")
+		}
+	}
+
+	return out.String()
+}
+
 type IfStatement struct {
 	Token        token.Token
 	Conditions   []Expression
