@@ -266,6 +266,8 @@ func Printf(i *Interpreter, args []ast.Expression) ast.Expression {
 		}
 	}
 	result := fmt.Sprintf(fmtString, sprintfArgs...)
+	intRegex := regexp.MustCompile("%!d\\(float64=([0-9]+)\\)")
+	result = intRegex.ReplaceAllString(result, "$1")
 	return ast.NewLiteral(result)
 }
 
@@ -296,6 +298,8 @@ func Sprintf(i *Interpreter, args []ast.Expression) ast.Expression {
 		}
 	}
 	result := fmt.Sprintf(fmtString, sprintfArgs...)
+	intRegex := regexp.MustCompile("%!d\\(float64=([0-9]+)\\)")
+	result = intRegex.ReplaceAllString(result, "$1")
 	return ast.NewLiteral(result)
 }
 
