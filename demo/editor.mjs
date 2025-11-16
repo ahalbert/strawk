@@ -41,7 +41,7 @@ const themeCompartment = new Compartment();
 export const parserWithMetadata = parser.configure({
   props: [
     styleTags({
-      "BEGIN END do while for in continue print next if else break length sub gsub split toupper tolower substr index match atan2 cos sin exp log sqrt" : t.keyword,
+      "BEGIN END do while for in continue print printf next if else break length sub gsub split toupper tolower substr index match atan2 cos sin exp log sqrt int rand srand sprintf" : t.keyword,
       identifier: t.tagName,
       stateidentifier: t.variableName,
       String: t.string,

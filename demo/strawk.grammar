@@ -15,6 +15,7 @@ Statement[@isGroup=statement] {
   ReturnStatement |
   IfStatement |
   PrintStatement |
+  PrintfStatement |
   DeleteStatement |
   AssignStatement 
 }
@@ -34,6 +35,7 @@ ContinueStatement { kw<"continue"> }
 ReturnStatement { kw<"return"> Expression }
 IfStatement { kw<"if"> Expression Block (kw<"else"> kw<"if"> Expression Block)* (kw<"else"> Block)? }
 PrintStatement { kw<"print"> Expression (',' Expression)* }
+PrintfStatement { kw<"printf"> Expression (',' Expression)* }
 DeleteStatement { kw<"delete"> Expression }
 AssignStatement { 
   identifier ( ',' identifier)* '=' Expression (',' Expression)* |
@@ -45,7 +47,7 @@ Expression {
 }
 
 StdLibCall {kw<"length"> | kw<"sub"> | kw<"gsub"> | kw<"split"> | kw<"tolower"> | kw<"toupper"> | kw<"substr"> | kw<"match"> | kw<"index"> | kw<"atan2"> | 
-  kw<"cos"> | kw<"sin"> | kw<"exp"> | kw<"log"> | kw<"sqrt"> | kw<"int"> | kw<"rand"> | kw<"srand"> }
+  kw<"cos"> | kw<"sin"> | kw<"exp"> | kw<"log"> | kw<"sqrt"> | kw<"int"> | kw<"rand"> | kw<"srand"> | kw<"sprintf"> }
 
 Prefix { !inf PrefixOp? identifier !inf PrefixOp? | String | Number | '-' | '!' }
 
@@ -60,7 +62,6 @@ kw<term> { @specialize[@name={term}]<identifier, term> }
     '"' ( ![\\\n"])* '"' |
     "'" (![\\\n'] )* "'"
   }
-  stateidentifier[@export] { $[0-9a-zA-Z_]+ } 
   Regex { "/" (![\n]* "/" | ![\n]* "/" ![\n]* "/")+}
   identifier[@export] { $[0-9a-zA-Z_$@]+ } 
   Colon { ":" }
