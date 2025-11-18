@@ -22,6 +22,8 @@ So I made a prototype awk language that uses structural regular expressions. It 
 
 ## Using 
 
+Some familiarity with normal AWK is helpful: [Linux Handbook AWK Tutorial](https://linuxhandbook.com/awk-command-tutorial/)
+
 Strawk is given: 
 1. *A program*, a series of regular expressions and code blocks, 
 2. *Input*, either a file or input from stdin.
