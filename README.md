@@ -17,7 +17,7 @@ So I made a prototype awk language that uses structural regular expressions. It 
 
 ## Installing
 
-1. Clone the repository
+1. Clone the repository.
 2. Run `make install`. This will install the binary in your $GOBIN folder or ~/go/bin if it's not installed. You will have to add ~/go/bin to your path if it's not already there.
 
 ## Using 
@@ -35,7 +35,7 @@ BEGIN {
     print "--header--"
 }
 
-# The first and highest priority expression 
+# The first and highest priority expression - other blocks will not run if this matches.
 /foobar/ {
     # do something
 }
