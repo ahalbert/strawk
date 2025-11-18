@@ -9,7 +9,7 @@ strawk now has a live demo! [Try it out here](https://ahalbert.github.io/strawk/
 
 An AWK implementation using Structural Regular Expressions rather than processing things line-by-line.
 
-Rob Pike wrote a paper,, [Structural Regular Expressions](https://doc.cat-v.org/bell_labs/structural_regexps/se.pdf), that criticized the Unix toolset for being excessively line oriented. Tools like awk and grep assume a regular record structure usually denoted by newlines. Unix pipes just stream the file from one command to another, and imposing the newline structure limits the power of the Unix shell. 
+Rob Pike wrote a paper, [Structural Regular Expressions](https://doc.cat-v.org/bell_labs/structural_regexps/se.pdf), that criticized the Unix toolset for being excessively line oriented. Tools like awk and grep assume a regular record structure usually denoted by newlines. Unix pipes just stream the file from one command to another, and imposing the newline structure limits the power of the Unix shell. 
 
 In the paper, Mr. Pike proposed an awk of the future that used structural regular expressions to parse input instead of line by line processing. As far as I know, it was never implemented. 
 
