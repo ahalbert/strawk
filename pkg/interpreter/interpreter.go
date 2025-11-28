@@ -216,42 +216,45 @@ func (i *Interpreter) lookupVar(varName ast.Expression) ast.Expression {
 }
 
 func (i *Interpreter) setVar(varName ast.Expression, value ast.Expression) {
-	var id string
-	var index []ast.Expression
-	switch varName.(type) {
-	case *ast.Identifier:
-		id = varName.(*ast.Identifier).Value
-		index = nil
-	case *ast.ArrayIndexExpression:
-		id = varName.(*ast.ArrayIndexExpression).ArrayName
-		index = varName.(*ast.ArrayIndexExpression).IndexList
-	default:
-		panic("Unexpected expression type in lookupVar")
+	id, index := i.parseVar(varName)
+	localScope := i.Stack[len(i.Stack)-1].LocalVariables
+
+	if _, ok := localScope[id]; ok {
+		if index == nil {
+			localScope[id] = value
+		}
+
+		return
 	}
-	_, ok := i.Stack[len(i.Stack)-1].LocalVariables[id]
-	if ok {
-		if index == nil {
-			i.Stack[len(i.Stack)-1].LocalVariables[id] = value
-		} else {
-		}
-	} else {
-		if index == nil {
-			i.GlobalVariables[id] = value
-		} else {
-			m, ok := i.GlobalVariables[id]
-			if ok {
-				switch m.(type) {
-				case *ast.AssociativeArray:
-					m.(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-				default:
-					i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-					i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-				}
-			} else {
-				i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-				i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-			}
-		}
+
+	if index == nil {
+		i.GlobalVariables[id] = value
+		return
+	}
+
+	i.setGlobalArrayElement(id, index, value)
+}
+
+func (i *Interpreter) setGlobalArrayElement(id string, index []ast.Expression, value ast.Expression) {
+	if arr, ok := i.GlobalVariables[id].(*ast.AssociativeArray); ok {
+		arr.Array[i.transformArrayLookupExpression(index)] = value
+		return
+	}
+
+	i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
+	i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
+}
+
+func (i *Interpreter) parseVar(varName ast.Expression) (string, []ast.Expression) {
+	switch v := varName.(type) {
+	case *ast.Identifier:
+		// Simple variable like: x = 5
+		return v.Value, nil
+	case *ast.ArrayIndexExpression:
+		// Array element like: arr[1] = 5 or arr[1,2] = 5
+		return v.ArrayName, v.IndexList
+	default:
+		panic("Unexpected expression type in parseVar")
 	}
 }
 
