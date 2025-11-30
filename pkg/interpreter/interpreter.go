@@ -87,6 +87,7 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 
 func (i *Interpreter) initDefaultGlobals() {
 	i.GlobalVariables["OFS"] = &ast.StringLiteral{Value: " "}
+	i.GlobalVariables["RS"] = &ast.StringLiteral{Value: "\n"}
 }
 
 func (i *Interpreter) Run(input string) {
@@ -359,7 +360,7 @@ func (i *Interpreter) doPrintStatement(stmt *ast.PrintStatement) {
 	}
 
 	io.WriteString(i.Output, strings.Join(asStrings, i.GlobalVariables["OFS"].String()))
-	io.WriteString(i.Output, "\n")
+	io.WriteString(i.Output, i.GlobalVariables["RS"].String())
 }
 
 func (i *Interpreter) doAssignStatement(stmt *ast.AssignStatement) {
