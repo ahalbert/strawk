@@ -85,6 +85,7 @@ const (
 	RETURN   = "RETURN"
 	FUNCTION = "FUNCTION"
 	DELETE   = "DELETE"
+	PARSE    = "PARSE"
 )
 
 var keywords = map[string]TokenType{
@@ -104,6 +105,7 @@ var keywords = map[string]TokenType{
 	"function": FUNCTION,
 	"return":   RETURN,
 	"delete":   DELETE,
+	"parse":    PARSE,
 }
 
 func LookupIdent(ident string) TokenType {
