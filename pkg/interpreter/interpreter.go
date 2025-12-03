@@ -221,8 +221,9 @@ func (i *Interpreter) setVar(varName ast.Expression, value ast.Expression) {
 	if _, ok := localScope[id]; ok {
 		if index == nil {
 			localScope[id] = value
+		} else {
+			i.setArrayElement(localScope, id, index, value)
 		}
-
 		return
 	}
 
@@ -231,17 +232,18 @@ func (i *Interpreter) setVar(varName ast.Expression, value ast.Expression) {
 		return
 	}
 
-	i.setGlobalArrayElement(id, index, value)
+	i.setArrayElement(i.GlobalVariables, id, index, value)
 }
 
-func (i *Interpreter) setGlobalArrayElement(id string, index []ast.Expression, value ast.Expression) {
-	if arr, ok := i.GlobalVariables[id].(*ast.AssociativeArray); ok {
-		arr.Array[i.transformArrayLookupExpression(index)] = value
+func (i *Interpreter) setArrayElement(scope map[string]ast.Expression, id string, index []ast.Expression, value ast.Expression) {
+	key := i.transformArrayLookupExpression(index)
+
+	if arr, ok := scope[id].(*ast.AssociativeArray); ok {
+		arr.Array[key] = value
 		return
 	}
 
-	i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-	i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
+	scope[id] = &ast.AssociativeArray{Array: map[string]ast.Expression{key: value}}
 }
 
 func (i *Interpreter) parseVar(varName ast.Expression) (string, []ast.Expression) {
