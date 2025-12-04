@@ -87,7 +87,6 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 
 func (i *Interpreter) initDefaultGlobals() {
 	i.GlobalVariables["OFS"] = &ast.StringLiteral{Value: " "}
-	i.GlobalVariables["RS"] = &ast.StringLiteral{Value: "\n"}
 }
 
 func (i *Interpreter) Run(input string) {
@@ -216,42 +215,47 @@ func (i *Interpreter) lookupVar(varName ast.Expression) ast.Expression {
 }
 
 func (i *Interpreter) setVar(varName ast.Expression, value ast.Expression) {
-	var id string
-	var index []ast.Expression
-	switch varName.(type) {
-	case *ast.Identifier:
-		id = varName.(*ast.Identifier).Value
-		index = nil
-	case *ast.ArrayIndexExpression:
-		id = varName.(*ast.ArrayIndexExpression).ArrayName
-		index = varName.(*ast.ArrayIndexExpression).IndexList
-	default:
-		panic("Unexpected expression type in lookupVar")
+	id, index := i.parseVar(varName)
+	localScope := i.Stack[len(i.Stack)-1].LocalVariables
+
+	if _, ok := localScope[id]; ok {
+		if index == nil {
+			localScope[id] = value
+		} else {
+			i.setArrayElement(localScope, id, index, value)
+		}
+		return
 	}
-	_, ok := i.Stack[len(i.Stack)-1].LocalVariables[id]
-	if ok {
-		if index == nil {
-			i.Stack[len(i.Stack)-1].LocalVariables[id] = value
-		} else {
-		}
-	} else {
-		if index == nil {
-			i.GlobalVariables[id] = value
-		} else {
-			m, ok := i.GlobalVariables[id]
-			if ok {
-				switch m.(type) {
-				case *ast.AssociativeArray:
-					m.(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-				default:
-					i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-					i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-				}
-			} else {
-				i.GlobalVariables[id] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-				i.GlobalVariables[id].(*ast.AssociativeArray).Array[i.transformArrayLookupExpression(index)] = value
-			}
-		}
+
+	if index == nil {
+		i.GlobalVariables[id] = value
+		return
+	}
+
+	i.setArrayElement(i.GlobalVariables, id, index, value)
+}
+
+func (i *Interpreter) setArrayElement(scope map[string]ast.Expression, id string, index []ast.Expression, value ast.Expression) {
+	key := i.transformArrayLookupExpression(index)
+
+	if arr, ok := scope[id].(*ast.AssociativeArray); ok {
+		arr.Array[key] = value
+		return
+	}
+
+	scope[id] = &ast.AssociativeArray{Array: map[string]ast.Expression{key: value}}
+}
+
+func (i *Interpreter) parseVar(varName ast.Expression) (string, []ast.Expression) {
+	switch v := varName.(type) {
+	case *ast.Identifier:
+		// Simple variable like: x = 5
+		return v.Value, nil
+	case *ast.ArrayIndexExpression:
+		// Array element like: arr[1] = 5 or arr[1,2] = 5
+		return v.ArrayName, v.IndexList
+	default:
+		panic("Unexpected expression type in parseVar")
 	}
 }
 
@@ -360,7 +364,7 @@ func (i *Interpreter) doPrintStatement(stmt *ast.PrintStatement) {
 	}
 
 	io.WriteString(i.Output, strings.Join(asStrings, i.GlobalVariables["OFS"].String()))
-	io.WriteString(i.Output, i.GlobalVariables["RS"].String())
+	io.WriteString(i.Output, "\n")
 }
 
 func (i *Interpreter) doAssignStatement(stmt *ast.AssignStatement) {
