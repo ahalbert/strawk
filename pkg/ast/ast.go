@@ -574,7 +574,6 @@ func (ds *DeleteStatement) String() string {
 
 type ParseStatement struct {
 	Token   token.Token
-	ToParse Expression
 	Actions *ActionBlock
 }
 
@@ -582,7 +581,7 @@ func (ps *ParseStatement) statementNode()        {}
 func (ps *ParseStatement) GetToken() token.Token { return ps.Token }
 func (ps *ParseStatement) String() string {
 	var out bytes.Buffer
-	out.WriteString("parse " + ps.ToParse.String() + "{\n")
+	out.WriteString("parse " + "{\n")
 	out.WriteString(ps.Actions.String() + "\n}\n")
 	return out.String()
 }

@@ -88,6 +88,8 @@ func NewInterpreter(program *ast.Program, out io.Writer) *Interpreter {
 func (i *Interpreter) initDefaultGlobals() {
 	i.GlobalVariables["OFS"] = &ast.StringLiteral{Value: " "}
 	i.GlobalVariables["RS"] = &ast.StringLiteral{Value: "\n"}
+	i.GlobalVariables["QUOTE"] = &ast.StringLiteral{Value: "\""}
+	i.GlobalVariables["FS"] = &ast.StringLiteral{Value: ","}
 }
 
 func (i *Interpreter) Run(input string) {
@@ -128,12 +130,13 @@ func (i *Interpreter) Run(input string) {
 	}
 }
 
-func (i *Interpreter) advanceInput() {
+func (i *Interpreter) advanceInput() bool {
 	if i.InputPostion >= len(i.Input) {
-		return
+		return false
 	}
 	i.Stack[0].LocalVariables["$0"] = i.doConcatenate(i.Stack[0].LocalVariables["$0"], &ast.StringLiteral{Value: string(i.Input[i.InputPostion])})
 	i.InputPostion += 1
+	return true
 }
 
 func (i *Interpreter) backtrackInput() {
@@ -314,6 +317,8 @@ func (i *Interpreter) doStatement(stmt ast.Statement) {
 		i.doForEachStatement(stmt.(*ast.ForEachStatement))
 	case *ast.DeleteStatement:
 		i.doDeleteStatement(stmt.(*ast.DeleteStatement))
+	case *ast.ParseStatement:
+		i.doParseStatement(stmt.(*ast.ParseStatement))
 	default:
 		panic("Unexpected statement type")
 	}
@@ -685,16 +690,20 @@ func (i *Interpreter) doRegexMatch(left ast.Expression, right ast.Expression, is
 			i.consumeInput()
 			matches = prevMatches
 		}
-		i.mostRecentRegexCaptureGroups["$MATCHES"] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
-		matchesArray, _ := i.mostRecentRegexCaptureGroups["$MATCHES"].(*ast.AssociativeArray)
-		for idx, match := range matches {
-			stridx := "$" + strconv.Itoa(idx)
-			i.mostRecentRegexCaptureGroups[stridx] = ast.NewLiteral(match)
-			matchesArray.Array[stridx] = ast.NewLiteral(match)
-		}
+		i.putMatchesInNumberedFieldsAndMATCHES(matches)
 		return boolToExpression(true)
 	}
 	return boolToExpression(false)
+}
+
+func (i *Interpreter) putMatchesInNumberedFieldsAndMATCHES(matches []string) {
+	i.mostRecentRegexCaptureGroups["$MATCHES"] = &ast.AssociativeArray{Array: make(map[string]ast.Expression)}
+	matchesArray, _ := i.mostRecentRegexCaptureGroups["$MATCHES"].(*ast.AssociativeArray)
+	for idx, match := range matches {
+		stridx := "$" + strconv.Itoa(idx)
+		i.mostRecentRegexCaptureGroups[stridx] = ast.NewLiteral(match)
+		matchesArray.Array[stridx] = ast.NewLiteral(match)
+	}
 }
 
 func (i *Interpreter) doFunctionCall(call *ast.CallExpression) ast.Expression {
@@ -967,4 +976,18 @@ func (i *Interpreter) doDeleteStatement(stmt *ast.DeleteStatement) {
 		panic("Attempt to delete on scalar variable")
 	}
 	delete(array.Array, i.transformArrayLookupExpression(stmt.ToDelete.IndexList))
+}
+
+func (i *Interpreter) doParseStatement(stmt *ast.ParseStatement) {
+
+	rs := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "RS"}))
+	fs := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "FS"}))
+	qc := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "QC"}))
+
+	for i.InputPostion < len(i.Input) && i.(rs) {
+	}
+}
+
+func (i *Interpreter) checkEndMatches(string rs) {
+
 }

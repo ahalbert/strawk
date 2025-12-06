@@ -776,21 +776,6 @@ func (p *Parser) parseDeleteStatement() *ast.DeleteStatement {
 func (p *Parser) parseParseStatement() *ast.ParseStatement {
 	p.nextToken()
 	var stmt *ast.ParseStatement
-	stmt = &ast.ParseStatement{}
-	if !p.curTokenIs(token.LBRACE) {
-		expr := p.parseExpression(LOWEST)
-		switch expr.(type) {
-		case *ast.StringLiteral:
-		case *ast.Identifier:
-		default:
-			p.addParseError("Expected string literal or identfier expression with parse statement")
-		}
-		stmt.ToParse = expr
-	}
-
-	if !p.curTokenIs(token.LBRACE) {
-		p.addParseError("Expected block after parse statement.")
-	}
 	stmt.Actions = p.parseBlock()
 	return stmt
 }
