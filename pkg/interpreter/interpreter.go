@@ -983,11 +983,25 @@ func (i *Interpreter) doParseStatement(stmt *ast.ParseStatement) {
 	rs := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "RS"}))
 	fs := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "FS"}))
 	qc := convertLiteralForStringOp(i.lookupVar(&ast.Identifier{Value: "QC"}))
+	i.advanceInput()
+	quoteMode := false
+	var fields []string
+	field := ""
 
-	for i.InputPostion < len(i.Input) && i.(rs) {
+	for i.InputPostion < len(i.Input) && !quoteMode && !i.checkEndMatchesInput(rs) {
+		quoteMode = i.checkEndMatchesInput(qc)
+		if !quoteMode && i.checkEndMatchesInput(fs) {
+			fields = append(fields, field)
+			field = ""
+		}
+		i.advanceInput()
+		currInput := convertLiteralForStringOp(i.Stack[0].LocalVariables["$0"])
+		field += currInput[len(currInput)-1:]
 	}
+	i.putMatchesInNumberedFieldsAndMATCHES(fields)
 }
 
-func (i *Interpreter) checkEndMatches(string rs) {
-
+func (i *Interpreter) checkEndMatchesInput(toMatch string) bool {
+	regex := regexp.MustCompile(".*" + toMatch + "$")
+	return regex.MatchString(convertLiteralForStringOp(i.Stack[0].LocalVariables["$0"]))
 }
